@@ -4,11 +4,12 @@ import requests
 import numpy
 import cv2
 import pytesseract
+import keys
 
 reddit = praw.Reddit(
-    client_id="",
-    client_secret="",
-    user_agent="",
+    client_id=keys.client_id,
+    client_secret=keys.client_secret,
+    user_agent=keys.user_agent,
 )
 
 def gray(image):
@@ -70,7 +71,7 @@ create_folder(image_path)
 
 subreddit = reddit.subreddit("AdviceAnimals")
 
-for submission in subreddit.top(limit = 10):
+for submission in subreddit.hot(limit = 5):
     if "jpg" in submission.url.lower() or "png" in submission.url.lower():
         image = scrape_image(submission)
         dl_image(image_path, submission, image)
