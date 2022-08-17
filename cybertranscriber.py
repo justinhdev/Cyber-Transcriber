@@ -27,7 +27,7 @@ def black_to_white(image, opening):
     image = 255 - opening
     return image 
 
-def preprocessing(image):
+def preprocess(image):
     image = resize(image)
     image = gray(image)
     image = med_blur(image)
@@ -42,16 +42,17 @@ def create_folder(image_path):
     if not CHECK_FOLDER:
         os.makedirs(image_path)
 
+def dl_image(image_path, submission, image):
+    cv2.imwrite(f"{image_path}{subreddit}---{submission.id}.png", image)
+
+def dl_preproccesed(image_path, submission, image):
+    cv2.imwrite(f"{image_path}preprocessed---{subreddit}---{submission.id}.png", image)
+
 def scrape_image(submission):
     response = requests.get(submission.url.lower(), stream = True).raw
     image = numpy.asarray(bytearray(response.read()), dtype = "uint8")
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    cv2.imwrite(f"{subreddit}-{submission.id}.png", image)
     return image
-
-def scrape_preproccesed(submission, image):
-    cv2.imwrite(f"{subreddit}xxx{submission.id}.png", image)
-    return
 
 def find_text(image):
     txt = pytesseract.image_to_string(image, 
@@ -69,11 +70,12 @@ create_folder(image_path)
 
 subreddit = reddit.subreddit("AdviceAnimals")
 
-for submission in subreddit.hot(limit = 5):
+for submission in subreddit.top(limit = 10):
     if "jpg" in submission.url.lower() or "png" in submission.url.lower():
         image = scrape_image(submission)
-        image = preprocessing(image)
-        scrape_preproccesed(submission, image)
+        dl_image(image_path, submission, image)
+        image = preprocess(image)
+        dl_preproccesed(image_path, submission, image)
         find_text(image)
         
         
