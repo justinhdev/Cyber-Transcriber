@@ -5,12 +5,10 @@ import numpy
 import cv2
 import pytesseract
 import keys
+import config
 
-reddit = praw.Reddit(
-    client_id=keys.client_id,
-    client_secret=keys.client_secret,
-    user_agent=keys.user_agent,
-)
+def resize(image):
+    return cv2.resize(image, None, fx = 6, fy = 6, interpolation = cv2.INTER_CUBIC)
 
 def gray(image):
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -20,9 +18,6 @@ def med_blur(image):
 
 def threshold(image):
     return cv2.threshold(image, 240, 255, cv2.THRESH_BINARY)[1]
-
-def resize(image):
-    return cv2.resize(image, None, fx = 6, fy = 6, interpolation = cv2.INTER_CUBIC)
 
 def black_to_white(image, opening):
     image = 255 - opening
@@ -56,8 +51,7 @@ def scrape_image(submission):
     return image
 
 def find_text(image):
-    txt = pytesseract.image_to_string(image, 
-    config='-c tessedit_char_whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 "')
+    txt = pytesseract.image_to_string(image, config=config.config)
     if txt.isspace():
         print("Image was not found")
     else:
@@ -65,11 +59,17 @@ def find_text(image):
 
     print("*******************************")
 
+reddit = praw.Reddit(
+    client_id=keys.client_id,
+    client_secret=keys.client_secret,
+    user_agent=keys.user_agent,
+)
+
 directory_path = os.path.abspath(os.path.curdir)
 image_path = os.path.join(directory_path, "images/")
 create_folder(image_path)
 
-subreddit = reddit.subreddit("AdviceAnimals")
+subreddit = reddit.subreddit(config.subreddits)
 
 for submission in subreddit.hot(limit = 5):
     if "jpg" in submission.url.lower() or "png" in submission.url.lower():

@@ -1,0 +1,5 @@
+numpy==1.23.1
+opencv_python==4.6.0.66
+praw==7.6.0
+pytesseract==0.3.9
+requests==2.22.0
