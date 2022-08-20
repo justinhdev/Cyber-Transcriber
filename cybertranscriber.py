@@ -10,7 +10,7 @@ import config
 
 def resize(image):
     # Resizes the image up by a scale of 6
-    return cv2.resize(image, None, fx=6, fy=6, interpolation=cv2.INTER_CUBIC)
+    return cv2.resize(image, None, fx=10, fy=10, interpolation=cv2.INTER_CUBIC)
 
 
 def gray(image):
@@ -32,7 +32,7 @@ def threshold(image):
 def opening(image):
     # More image blur and noise removal. Image erosion/dilation, increase kernel
     # size to increase blur.
-    kernel = numpy.ones((12, 12), numpy.uint8)
+    kernel = numpy.ones((10, 10), numpy.uint8)
     return cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
 
 
@@ -106,7 +106,7 @@ create_folder(image_path)
 subreddit = reddit.subreddit(config.subreddits)
 count = 0
 
-for submission in subreddit.top(limit=6):
+for submission in subreddit.hot(limit=config.post_count):
     if "jpg" in submission.url.lower() or "png" in submission.url.lower():
         image = scrape_image(submission)
         dl_image(image_path, submission, image)
